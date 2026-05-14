@@ -6,7 +6,7 @@ export const useMissionStore = defineStore('mission', () => {
   const readings = shallowRef<MedicalReading[]>([])
   const logs = ref<MissionLog[]>([])
   const isPaused = ref(false)
-  const timeRange = ref(5)
+  const timeRange = ref(5) // minutes
   
   // handle time filtering
   const filteredReadings = computed(() => {
@@ -14,24 +14,22 @@ export const useMissionStore = defineStore('mission', () => {
     return readings.value.filter(r => r.timestamp > cutoff)
   })
 
-  // --- ACTIONS (The Procedures) ---
   const addNewData = (data: MedicalReading) => {
-    // 1. If paused, freeze state. No new data enters.
     if (isPaused.value) return 
 
-    // 2. Comprehensive Medical Validation
     const isSafe = 
-      data.heartRate >= 30 && data.heartRate <= 250 && // Human heart limits
-      data.spo2 >= 0 && data.spo2 <= 100 &&           // Percentage limits
-      data.roomO2 >= 0 && data.roomO2 <= 100;         // Atmospheric limits
+      data.heartRate >= 30 && data.heartRate <= 250 && 
+      data.spo2 >= 0 && data.spo2 <= 100 &&           
+      data.roomO2 >= 0 && data.roomO2 <= 100;         
 
     if (!isSafe) {
       pushLog("ERROR: Malformed or out-of-range telemetry detected.", "alert")
       return
     }
 
-    // 3. Performance Update: Create new array and keep last 100 readings.. prevent memory leak
-    readings.value = [...readings.value, data].slice(-100)
+    // Performance Update: Keep a window of data for charts
+    // 500 readings is enough for 2 seconds * 3 people * 5-10 mins
+    readings.value = [...readings.value, data].slice(-1000)
   }
 
   const pushLog = (message: string, status: MissionLog['status']) => {
@@ -42,7 +40,6 @@ export const useMissionStore = defineStore('mission', () => {
       status
     }
 
-    // Newest first logic, then keep only the last 50
     logs.value = [newLog, ...logs.value].slice(0, 50)
   }
 

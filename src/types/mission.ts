@@ -4,6 +4,7 @@ export interface MedicalReading {
   heartRate: number; 
   spo2: number;      
   roomO2: number;   
+  psi: number;
   status: 'stable' | 'stressed' | 'critical';
 }
 

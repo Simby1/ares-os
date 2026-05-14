@@ -5,42 +5,60 @@ import type { MedicalReading } from '@/types/mission'
 export function useAresStream() {
   const store = useMissionStore()
   let intervalId: any
-
   const crewMembers = ['CMDR. STEVENS', 'DR. ARYA', 'ENG. CHEN']
 
   const generateCrewData = () => {
-    // THE LOOP (Scalability)
+    if (store.isPaused) return
+
+    const isCrisis = Math.random() < 0.05
+    
+    // Shared environment
+    const baseO2 = 20.9
+    const basePSI = 14.7
+    
+    const sharedRoomO2 = isCrisis ? (17.0 + Math.random() * 2) : (20.5 + Math.random() * 0.8)
+    const sharedPSI = isCrisis ? (11.0 + Math.random() * 2) : (14.2 + Math.random() * 1.0)
+
+    const lastLog = store.logs[0]
+    if (isCrisis && sharedPSI < 12.5 && (!lastLog || !lastLog.message.includes("pressure drop"))) {
+      store.pushLog("CRITICAL: Habitat pressure drop!", "alert")
+    }
+
     crewMembers.forEach((member) => {
+      // Different profiles for different members
+      let baseHR = 70
+      if (member === 'ENG. CHEN') baseHR = 85 // Higher physical activity
+      if (member === 'DR. ARYA') baseHR = 65 // Calm
       
-      // PHYSIOLOGICAL LOGIC
-      const hr = Math.floor(65 + Math.random() * 30) // 65-95 BPM
-      const spo2 = +(95 + Math.random() * 5).toFixed(1) // 95-100%
-      const roomO2 = +(20.8 + Math.random() * 0.4).toFixed(1) // Atmospheric O2
+      const hrVariance = isCrisis ? (60 + Math.random() * 20) : (Math.random() * 10)
+      const hr = Math.floor(baseHR + hrVariance)
+      
+      const spo2 = isCrisis ? (88 + Math.random() * 5) : (97 + Math.random() * 3)
 
-      // DATA PACKET
       const reading: MedicalReading = {
-      timestamp: Date.now(),
-      crewId: member,
-      heartRate: hr,
-      spo2: spo2,
-      roomO2: roomO2,
-      status: (hr > 110 || spo2 < 93) ? 'critical' : 'stable'
-   }
+        timestamp: Date.now(),
+        crewId: member,
+        heartRate: hr,
+        spo2: parseFloat(spo2.toFixed(1)),
+        roomO2: parseFloat(sharedRoomO2.toFixed(1)),
+        psi: parseFloat(sharedPSI.toFixed(1)), 
+        status: (hr > 120 || spo2 < 90) ? 'critical' : (hr > 100 ? 'stressed' : 'stable')
+      }
 
-      // SHIP TO STORE
+      const memberReadings = store.readings.filter(r => r.crewId === member)
+      const previousStatus = memberReadings[memberReadings.length - 1]?.status
+
       store.addNewData(reading)
 
-      // INTELLIGENT LOGGING
-      if (reading.status === 'critical') {
-        store.pushLog(`ALERT: Abnormal vitals detected for ${member}`, 'alert')
+      if (reading.status === 'critical' && previousStatus !== 'critical') {
+        store.pushLog(`ALERT: ${member} vital distress`, 'alert')
       }
     })
   }
 
   onMounted(() => {
-    // generate data for all crew every 2 seconds
-    intervalId = setInterval(generateCrewData, 2000)
-    store.pushLog("ARES-OS: Multi-crew biometric link active.", "nominal")
+    intervalId = setInterval(generateCrewData, 500)
+    store.pushLog("ARES-OS: Link Active. Mars-Base-Alpha telemetry online.", "nominal")
   })
 
   onUnmounted(() => {
