@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { 
   Activity, 
   AlertTriangle, 
@@ -11,7 +11,9 @@ import {
   Pause, 
   Clock,
   Heart,
-  Droplets
+  Droplets,
+  LayoutDashboard,
+  MessageSquare
 } from 'lucide-vue-next'
 import { useAresStream } from './composables/useAresStream'
 import { useMissionStore } from './stores/missionStore'
@@ -22,6 +24,9 @@ useAresStream()
 const store = useMissionStore()
 
 const crewNames = ['CMDR. STEVENS', 'DR. ARYA', 'ENG. CHEN']
+
+// Mobile tabs state
+const activeMobileTab = ref<'bio' | 'data' | 'logs'>('bio')
 
 // 2. Latest stats for the Personnel cards
 const latestStats = computed(() => {
@@ -74,15 +79,15 @@ const setTimeRange = (mins: number) => {
     </div>
 
     <!-- HEADER -->
-    <header class="border-b border-ares-orange/30 pb-3 mb-4 flex justify-between items-end relative z-10">
-      <div class="flex gap-8 items-end">
+    <header class="border-b border-ares-orange/30 pb-3 mb-4 flex flex-col md:flex-row justify-between items-start md:items-end relative z-10 gap-4">
+      <div class="flex gap-4 md:gap-8 items-end">
         <div>
           <div class="flex items-center gap-2 mb-1">
             <div class="w-1.5 h-1.5 rounded-full bg-ares-orange animate-ping"></div>
             <span class="text-[7px] text-ares-orange tracking-[0.5em] uppercase font-bold">Signal: OSCILLATING // T-STAMP: {{ new Date().getFullYear() }}.05.14</span>
           </div>
           <h1 class="text-3xl font-black text-ares-orange tracking-tighter uppercase italic flex items-center gap-3 text-glow-orange">
-            Ares-OS <span class="text-white/20 font-thin">/</span> <span class="text-white">Mission_Ctrl</span>
+            Ares-OS
           </h1>
           <p class="text-[9px] text-ares-orange/40 tracking-[0.4em] mt-1 uppercase font-bold">Sector: Mars-Base-Alpha <span class="ml-4 opacity-50 underline decoration-ares-orange/20">RELAY_STATION_04</span></p>
         </div>
@@ -113,8 +118,8 @@ const setTimeRange = (mins: number) => {
       </div>
       
       <!-- CONTROLS -->
-      <div class="flex items-center gap-4 bg-white/[0.03] p-2 rounded border border-white/10 backdrop-blur-sm">
-        <div class="flex gap-1 mr-4 bg-black/40 p-0.5 rounded border border-white/5">
+      <div class="flex items-center gap-2 md:gap-4 bg-white/[0.03] p-2 rounded border border-white/10 backdrop-blur-sm w-full md:w-auto overflow-x-auto">
+        <div class="flex gap-1 mr-2 md:mr-4 bg-black/40 p-0.5 rounded border border-white/5 shrink-0">
           <button 
             v-for="range in [1, 5, 15, 60]" :key="range"
             @click="setTimeRange(range)"
@@ -126,13 +131,13 @@ const setTimeRange = (mins: number) => {
         </div>
 
         <button @click="togglePause" 
-                class="flex items-center gap-2 px-4 py-1.5 rounded transition-all uppercase text-[9px] font-black tracking-widest border"
+                class="flex items-center gap-2 px-4 py-1.5 rounded transition-all uppercase text-[9px] font-black tracking-widest border shrink-0"
                 :class="store.isPaused ? 'bg-ares-orange/20 text-ares-orange border-ares-orange/40 hover:bg-ares-orange/30' : 'bg-ares-cyan/10 text-ares-cyan border-ares-cyan/30 hover:bg-ares-cyan/20'">
           <component :is="store.isPaused ? Play : Pause" class="w-3 h-3" />
           {{ store.isPaused ? 'EXEC_RESUME' : 'SYS_HALT' }}
         </button>
 
-        <div class="text-right border-l border-white/10 pl-4 ml-2">
+        <div class="text-right border-l border-white/10 pl-4 ml-2 shrink-0">
           <p class="text-[7px] text-white/20 uppercase tracking-[0.3em] mb-1 font-bold">OS_BUFFER</p>
           <div class="flex items-center gap-2 justify-end">
              <div class="w-1 h-1 rounded-full animate-ping" :class="store.isPaused ? 'bg-ares-orange' : 'bg-ares-cyan'"></div>
@@ -142,11 +147,34 @@ const setTimeRange = (mins: number) => {
       </div>
     </header>
 
-    <!-- MAIN GRID -->
+    <!-- MOBILE NAVIGATION (MOVED TO TOP) -->
+    <nav class="flex lg:hidden w-full gap-1 p-1 bg-white/[0.05] rounded border border-white/10 mb-4 shrink-0 z-20">
+      <button @click="activeMobileTab = 'bio'" 
+              class="flex-1 flex items-center justify-center gap-2 py-2 rounded transition-all text-[10px] font-black uppercase tracking-widest"
+              :class="activeMobileTab === 'bio' ? 'bg-ares-orange text-black' : 'text-white/40 hover:bg-white/10'">
+        <Users class="w-3 h-3" />
+        <span class="hidden xs:inline">Crew</span>
+      </button>
+      <button @click="activeMobileTab = 'data'" 
+              class="flex-1 flex items-center justify-center gap-2 py-2 rounded transition-all text-[10px] font-black uppercase tracking-widest"
+              :class="activeMobileTab === 'data' ? 'bg-ares-cyan text-black' : 'text-white/40 hover:bg-white/10'">
+        <LayoutDashboard class="w-3 h-3" />
+        <span class="hidden xs:inline">Data</span>
+      </button>
+      <button @click="activeMobileTab = 'logs'" 
+              class="flex-1 flex items-center justify-center gap-2 py-2 rounded transition-all text-[10px] font-black uppercase tracking-widest"
+              :class="activeMobileTab === 'logs' ? 'bg-ares-orange text-black' : 'text-white/40 hover:bg-white/10'">
+        <Terminal class="w-3 h-3" />
+        <span class="hidden xs:inline">Log</span>
+      </button>
+    </nav>
+
+    <!-- MAIN GRID (MOBILE TABS) -->
     <div class="grid grid-cols-12 gap-6 flex-grow overflow-hidden relative z-10">
       
       <!-- LEFT: PERSONNEL -->
-      <aside class="col-span-12 lg:col-span-3 flex flex-col gap-4 overflow-y-auto lg:overflow-visible custom-scrollbar">
+      <aside :class="{ 'hidden lg:flex': activeMobileTab !== 'bio', 'flex': activeMobileTab === 'bio' }" 
+             class="col-span-12 lg:col-span-3 flex-col gap-4 overflow-y-auto custom-scrollbar h-full">
         <div class="ares-card flex-grow h-fit group border-ares-orange/10">
           <div class="flex items-center justify-between mb-6 border-b border-ares-orange/20 pb-2">
             <div class="flex items-center gap-2">
@@ -218,7 +246,8 @@ const setTimeRange = (mins: number) => {
       </aside>
 
       <!-- CENTER: DATA VISUALIZATION -->
-      <section class="col-span-12 lg:col-span-6 flex flex-col gap-4 overflow-hidden">
+      <section :class="{ 'hidden lg:flex': activeMobileTab !== 'data', 'flex': activeMobileTab === 'data' }"
+               class="col-span-12 lg:col-span-6 flex-col gap-4 overflow-hidden">
         
         <!-- HEART RATE OVERVIEW -->
         <div class="ares-card h-[45%] flex flex-col relative overflow-hidden bg-ares-cyan/[0.03] border-ares-cyan/30">
@@ -262,7 +291,8 @@ const setTimeRange = (mins: number) => {
       </section>
 
       <!-- RIGHT: EVENT TERMINAL -->
-      <aside class="col-span-12 lg:col-span-3 flex flex-col gap-4 overflow-hidden h-full">
+      <aside :class="{ 'hidden lg:flex': activeMobileTab !== 'logs', 'flex': activeMobileTab === 'logs' }"
+             class="col-span-12 lg:col-span-3 flex-col gap-4 overflow-hidden h-full">
         <div class="ares-card flex-grow overflow-hidden flex flex-col bg-ares-orange/[0.02] border-ares-orange/20 shadow-[inset_0_0_50px_rgba(255,95,31,0.05)]">
           <div class="flex items-center gap-2 mb-4 border-b border-ares-orange/20 pb-2">
             <Terminal class="w-3 h-3 text-ares-orange" />
@@ -301,8 +331,8 @@ const setTimeRange = (mins: number) => {
     </div>
 
     <!-- FOOTER STATUS -->
-    <footer class="mt-4 pt-2 border-t border-white/5 flex justify-between items-center text-[7px] text-white/30 uppercase tracking-[0.4em] font-black relative z-10">
-      <div class="flex gap-8 items-center">
+    <footer class="mt-4 pt-2 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[7px] text-white/30 uppercase tracking-[0.4em] font-black relative z-10 gap-4">
+      <div class="flex gap-4 md:gap-8 items-center w-full md:w-auto justify-between md:justify-start">
         <div class="flex gap-2 items-center">
           <div class="w-1 h-1 bg-ares-cyan"></div>
           <span>NET_LNK: SECURE // 10.0.1.MARS</span>
