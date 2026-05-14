@@ -1,11 +1,12 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useAresStream } from './composables/useAresStream'
+// turn on the whole "Truck" system.. aresStream
+useAresStream()
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <div class="mission-control">
+    <h1>ARES-OS IS ONLINE</h1>
+    <!-- UI here next -->
+  </div>
 </template>
-
-<style scoped></style>
