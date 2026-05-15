@@ -64,7 +64,7 @@ const setTimeRange = (mins: number) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-black text-white p-4 font-mono mission-control flex flex-col overflow-hidden relative">
+  <div class="min-h-screen bg-black text-white p-4 font-mono mission-control flex flex-col relative">
     
     <!-- SCANLINE & GRID EFFECT -->
     <div class="scanline pointer-events-none opacity-[0.03]"></div>
@@ -170,11 +170,11 @@ const setTimeRange = (mins: number) => {
     </nav>
 
     <!-- MAIN GRID (MOBILE TABS) -->
-    <div class="grid grid-cols-12 gap-6 flex-grow overflow-hidden relative z-10">
+    <div class="grid grid-cols-12 gap-6 flex-grow relative z-10">
       
       <!-- LEFT: PERSONNEL -->
       <aside :class="{ 'hidden lg:flex': activeMobileTab !== 'bio', 'flex': activeMobileTab === 'bio' }" 
-             class="col-span-12 lg:col-span-3 flex-col gap-4 overflow-y-auto custom-scrollbar h-full">
+             class="col-span-12 lg:col-span-3 flex-col gap-4 overflow-y-auto lg:overflow-y-visible custom-scrollbar">
         <div class="ares-card flex-grow h-fit group border-ares-orange/10">
           <div class="flex items-center justify-between mb-6 border-b border-ares-orange/20 pb-2">
             <div class="flex items-center gap-2">
@@ -247,10 +247,10 @@ const setTimeRange = (mins: number) => {
 
       <!-- CENTER: DATA VISUALIZATION -->
       <section :class="{ 'hidden lg:flex': activeMobileTab !== 'data', 'flex': activeMobileTab === 'data' }"
-               class="col-span-12 lg:col-span-6 flex-col gap-4 overflow-hidden">
+               class="col-span-12 lg:col-span-6 flex-col gap-4">
         
         <!-- HEART RATE OVERVIEW -->
-        <div class="ares-card h-[45%] flex flex-col relative overflow-hidden bg-ares-cyan/[0.03] border-ares-cyan/30">
+        <div class="ares-card h-[400px] lg:h-[45%] flex flex-col relative overflow-hidden bg-ares-cyan/[0.03] border-ares-cyan/30">
           <div class="flex justify-between items-center mb-4 border-b border-ares-cyan/10 pb-2">
             <h2 class="text-ares-cyan text-[10px] uppercase tracking-[0.4em] font-black italic flex items-center gap-2">
               <Activity class="w-3 h-3" /> Biometric_Stream // Heart_Rate
@@ -292,7 +292,7 @@ const setTimeRange = (mins: number) => {
 
       <!-- RIGHT: EVENT TERMINAL -->
       <aside :class="{ 'hidden lg:flex': activeMobileTab !== 'logs', 'flex': activeMobileTab === 'logs' }"
-             class="col-span-12 lg:col-span-3 flex-col gap-4 overflow-hidden h-full">
+             class="col-span-12 lg:col-span-3 flex-col gap-4 h-full">
         <div class="ares-card flex-grow overflow-hidden flex flex-col bg-ares-orange/[0.02] border-ares-orange/20 shadow-[inset_0_0_50px_rgba(255,95,31,0.05)]">
           <div class="flex items-center gap-2 mb-4 border-b border-ares-orange/20 pb-2">
             <Terminal class="w-3 h-3 text-ares-orange" />
@@ -367,7 +367,7 @@ body {
   font-family: 'JetBrains Mono', monospace;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow-x: hidden;
   background: black;
 }
 

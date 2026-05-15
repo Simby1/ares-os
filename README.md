@@ -1,42 +1,33 @@
-# ares-os
+# Ares-OS
 
-This template should help get you started developing with Vue 3 in Vite.
+A high-performance real-time telemetry visualization platform for Mars exploration missions.
 
-## Recommended IDE Setup
+## Architecture
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Framework**: Vue 3 (Composition API)
+- **State Management**: Pinia (Modular stores)
+- **Data Streaming**: Simulated WebSocket stream via Vue Composables
+- **Visualization**: ApexCharts for low-latency real-time updates
+- **Styling**: Tailwind CSS with custom thematic variables
 
-## Recommended Browser Setup
+## Key Features
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+- **Real-Time Streaming**: Simulated high-frequency telemetry data with individual crew profiles.
+- **Biometric Monitoring**: Live heart rate and SpO2 tracking for three crew members.
+- **Environmental Analytics**: Habitat pressure and atmospheric oxygen levels monitored in real-time.
+- **Interactive Terminal**: Live event logs with severity levels (Nominal, Warning, Alert).
+- **Control Center**: Pause/Resume telemetry and adjust data window range (1m to 60m).
+- **Responsive Design**: Mission-critical UI that adapts from widescreen monitors to tablets.
 
-## Type Support for `.vue` Imports in TS
+## Performance Optimizations
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+1. **Memory Management**: Data buffers are capped at 1000 records to prevent memory leaks during long-running sessions.
+2. **Reactivity Optimization**: Uses `shallowRef` for large telemetry arrays to reduce reconciliation overhead.
+3. **Throttled Updates**: Telemetry generation and chart reconciliation are decoupled to maintain 60fps UI performance.
+4. **Clean-up**: Lifecycles are managed via `onUnmounted` to ensure all intervals and subscriptions are destroyed.
 
-## Customize configuration
+## Setup Instructions
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
+1. `npm install` - Install dependencies
+2. `npm run dev` - Start development server
+3. `npm run build` - Create production bundle
